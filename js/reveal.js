@@ -5,6 +5,33 @@
  *
  * Copyright (C) 2018 Hakim El Hattab, http://hakim.se
  */
+ var socket = io();
+ var nextSlide;
+ var previousSlide;
+
+ document.addEventListener("DOMContentLoaded", function() {
+ 	nextSlide = new KeyboardEvent('keydown',{keyCode:39, key:'ArrowRight'});
+ 	previousSlide = new KeyboardEvent('keydown',{keyCode:37, key:'ArrowLeft'});
+ 	console.log("lalo this code is working");
+ });
+
+socket.on('server-msg', function(msg) {
+  msg = msg.toString();
+  switch (msg) {
+    case "light":
+      console.log("listening");
+      document.dispatchEvent(nextSlide);
+      break;
+      case "lightL":
+      document.dispatchEvent(previousSlide);
+      //code
+      break;
+      default:
+      //console.log("something else");
+      break;
+    }
+  });
+
 (function( root, factory ) {
 	if( typeof define === 'function' && define.amd ) {
 		// AMD. Register as an anonymous module.

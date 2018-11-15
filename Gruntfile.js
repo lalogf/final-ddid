@@ -28,10 +28,10 @@ module.exports = function(grunt) {
 				banner: '<%= meta.banner %>\n',
 				ie8: true
 			},
-			build: {
-				src: 'js/reveal.js',
-				dest: 'js/reveal.min.js'
-			}
+			// build: {
+			// 	src: 'js/reveal.js',
+			// 	dest: 'js/reveal.min.js'
+			// }
 		},
 
 		sass: {
@@ -64,32 +64,32 @@ module.exports = function(grunt) {
 			}
 		},
 
-		jshint: {
-			options: {
-				curly: false,
-				eqeqeq: true,
-				immed: true,
-				esnext: true,
-				latedef: 'nofunc',
-				newcap: true,
-				noarg: true,
-				sub: true,
-				undef: true,
-				eqnull: true,
-				browser: true,
-				expr: true,
-				loopfunc: true,
-				globals: {
-					head: false,
-					module: false,
-					console: false,
-					unescape: false,
-					define: false,
-					exports: false
-				}
-			},
-			files: [ 'Gruntfile.js', 'js/reveal.js' ]
-		},
+		// jshint: {
+		// 	options: {
+		// 		curly: false,
+		// 		eqeqeq: true,
+		// 		immed: true,
+		// 		esnext: true,
+		// 		latedef: 'nofunc',
+		// 		newcap: true,
+		// 		noarg: true,
+		// 		sub: true,
+		// 		undef: true,
+		// 		eqnull: true,
+		// 		browser: true,
+		// 		expr: true,
+		// 		loopfunc: true,
+		// 		globals: {
+		// 			head: false,
+		// 			module: false,
+		// 			console: false,
+		// 			unescape: false,
+		// 			define: false,
+		// 			exports: false
+		// 		}
+		// 	},
+		// 	files: [ 'Gruntfile.js', 'js/reveal.js' ]
+		// },
 
 		connect: {
 			server: {
@@ -98,10 +98,39 @@ module.exports = function(grunt) {
 					base: root,
 					livereload: true,
 					open: true,
-					useAvailablePort: true
+					useAvailablePort: true,
+					onCreateServer: function(server, connect, options) {
+						const SerialPort = require('serialport'); // serial library
+						const serial = new SerialPort('/dev/cu.SLAB_USBtoUART');
+						const Readline = SerialPort.parsers.Readline;
+						// const serial = new SerialPort(process.argv[2], {});
+						const parser = new Readline({
+						  delimiter: '\r\n'
+						});
+						var io = require('socket.io').listen(server);
+						serial.pipe(parser);
+						parser.on('data', function(data) {
+							io.emit('server-msg', data);
+						});
+						io.sockets.on('connection', function(socket) {
+							console.log('a user connected');
+							socket.on('ledON', function() {
+								serial.write('H');
+							});
+							  // if you get the 'ledOFF' msg, send an 'L' to the Arduino
+							  socket.on('ledOFF', function() {
+							  	serial.write('L');
+							  });
+							  // if you get the 'disconnect' message, say the user disconnected
+							  socket.on('disconnect', function() {
+							  	console.log('user disconnected');
+							  });
+							});
+					}
 				}
 			}
-		},
+		}
+		,
 
 		zip: {
 			bundle: {
@@ -119,10 +148,10 @@ module.exports = function(grunt) {
 		},
 
 		watch: {
-			js: {
-				files: [ 'Gruntfile.js', 'js/reveal.js' ],
-				tasks: 'js'
-			},
+			// js: {
+			// 	files: [ 'Gruntfile.js', 'js/reveal.js' ],
+			// 	tasks: 'js'
+			// },
 			theme: {
 				files: [
 					'css/theme/source/*.sass',
@@ -169,8 +198,8 @@ module.exports = function(grunt) {
 	// Default task
 	grunt.registerTask( 'default', [ 'css', 'js' ] );
 
-	// JS task
-	grunt.registerTask( 'js', [ 'jshint', 'uglify', 'qunit' ] );
+	// // JS task
+	// grunt.registerTask( 'js', [ 'jshint', 'uglify', 'qunit' ] );
 
 	// Theme CSS
 	grunt.registerTask( 'css-themes', [ 'sass:themes' ] );
@@ -187,7 +216,7 @@ module.exports = function(grunt) {
 	// Serve presentation locally
 	grunt.registerTask( 'serve', [ 'connect', 'watch' ] );
 
-	// Run tests
-	grunt.registerTask( 'test', [ 'jshint', 'qunit' ] );
+	// // Run tests
+	// grunt.registerTask( 'test', [ 'jshint', 'qunit' ] );
 
 };
