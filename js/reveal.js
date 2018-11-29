@@ -8,28 +8,41 @@
  var socket = io();
  var nextSlide;
  var previousSlide;
+ var videoOnPage;
+
+// document.body.addEventListener('DOMSubtreeModified', function () {
+//   if (document.getElementById('wistia_simple_video_69')){
+//   	console.log("there's a video of service dogs");
+//   };
+// }, false);
 
  document.addEventListener("DOMContentLoaded", function() {
  	nextSlide = new KeyboardEvent('keydown',{keyCode:39, key:'ArrowRight'});
  	previousSlide = new KeyboardEvent('keydown',{keyCode:37, key:'ArrowLeft'});
- 	console.log("lalo this code is working");
  });
 
 socket.on('server-msg', function(msg) {
   msg = msg.toString();
   switch (msg) {
-    case "light":
-      console.log("listening");
-      document.dispatchEvent(nextSlide);
-      break;
-      case "lightL":
-      document.dispatchEvent(previousSlide);
-      //code
-      break;
-      default:
+  	case "light":
+  	document.dispatchEvent(nextSlide);
+  	break;
+  	case "lightL":
+  	document.dispatchEvent(previousSlide);
+  	break;
+  	case "darkP":
+	  	Wistia.api().play();
+  	break;
+  	case "lightP":
+  		if (Wistia.api().state() === "playing"){
+	  		Wistia.api().pause();
+	  		Wistia.api().reset();
+	  	}
+  	break;
+  	default:
       //console.log("something else");
       break;
-    }
+  }
   });
 
 (function( root, factory ) {
