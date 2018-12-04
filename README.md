@@ -28,7 +28,7 @@ For the interaction between the arduino and the slides I used:
 
 ## Video of prototype working
 
-You can see the video in this [link](https://www.useloom.com/share/93fcb1771b72403ba723e5a1ed25af1a).
+You can see the video in this [link](https://lalogf.wistia.com/medias/wrha75uv4z).
 
 ## Code
 
